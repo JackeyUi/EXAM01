@@ -7,13 +7,24 @@ uLCD_4DGL uLCD(D1, D0, D2); // serial tx, serial rx, reset pin;
 InterruptIn BT1(A3), BT2(A4), BT3(A5);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
 EventQueue queue2(32 * EVENTS_EVENT_SIZE);
+EventQueue queue3(128 * EVENTS_EVENT_SIZE);
 AnalogOut  aout(PA_4);
 AnalogIn ain(A0);
 int U = 0;
 int DO = 0;
 int SEL = 0;
+float ADCdata[240];
 
-Thread t, TDAC;
+Thread t, TDAC, TADC;
+
+
+void ADC_102() {
+    TADC.start(callback(&queue3, &EventQueue::dispatch_forever));
+    for (int i = 0; i < 240; i++) {
+        printf("%f\r\n", ADCdata[i] * 3.3);
+        ThisThread::sleep_for(100ms);
+    }
+}
 
 void UP_() {
     U = 1;
@@ -31,8 +42,6 @@ int ULCD() {
     BT1.fall(queue.event(UP_));
     BT2.fall(queue.event(DOWN_));
     BT3.fall(queue.event(SEL_));
-    int S = 0;
-    int CM = -1;
     int CUR = 1;
     uLCD.background_color(WHITE);
     uLCD.cls();
@@ -158,12 +167,10 @@ int DAC_102() {
     TDAC.start(callback(&queue2, &EventQueue::dispatch_forever));
     int x = ULCD();
     
-    if(x == 1) {
-        float ADCdata[300];
+    if(x == 1) {      
         int g = 0;
         while (1) {
-            float ADCdata[300];
-            int g = 0;
+            
             while (1) {
                 for (float i = 0.0f; i < 240.0f; i += 1.0f) {
                     double sam = 0;
@@ -185,79 +192,119 @@ int DAC_102() {
                     g++;
                                
                 }
-                /*if (g == 900) {
-                    for (int i = 0; i < 300; i++) {
-                        printf("%f\r\n", ADCdata[i] * 3.3);
-                        ThisThread::sleep_for(100ms);
-                    }
-                    g = 0;
+                if (g == 721) {
+                    ADC_102();
                     return 0;
-                }*/
+                }
             }
         }
     }
+        if(x == 2) {
+
+        
+        while (1) {
+
+            int g = 0;
+            while (1) {
+                for (float i = 0.0f; i < 240.0f; i += 1.0f) {
+                    double sam = 0;
+                    if(i < 40) {
+                       sam =  i / 40 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else  if (i > 200){
+                       sam = (240 - i) / 40 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else {
+                        sam = 0.9;
+                        ThisThread::sleep_for(1ms);  
+                    }
+                    aout = sam;
+                    if (g%3 == 0)
+                    ADCdata[g/3] = ain;
+                    g++;
+                               
+                }
+                if (g == 720) {
+                    ADC_102();
+                    return 0;
+                }
+            }
+        }
+        }
+        if(x == 4) {
+  
+        
+        while (1) {
+        
+            int g = 0;
+            while (1) {
+                for (float i = 0.0f; i < 240.0f; i += 1.0f) {
+                    double sam = 0;
+                    if(i < 20) {
+                       sam =  i / 20 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else  if (i > 220){
+                       sam = (240 - i) / 20 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else {
+                        sam = 0.9;
+                        ThisThread::sleep_for(1ms);  
+                    }
+                    aout = sam;
+                    if (g%3 == 0)
+                    ADCdata[g/3] = ain;
+                    g++;
+                               
+                }
+                if (g == 720) {
+                    ADC_102();
+                    return 0;
+                }
+            }
+        }
+        }
+        if(x == 8) {
+     
+        int g = 0;
+        while (1) {
+ 
+            int g = 0;
+            while (1) {
+                for (float i = 0.0f; i < 240.0f; i += 1.0f) {
+                    double sam = 0;
+                    if(i < 10) {
+                       sam =  i / 10 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else  if (i > 230){
+                       sam = (240 - i) / 10 * 9 / 10;
+                       ThisThread::sleep_for(1ms);  
+                    }
+                    else {
+                        sam = 0.9;
+                        ThisThread::sleep_for(1ms);  
+                    }
+                    aout = sam;
+                    if (g%3 == 0)
+                    ADCdata[g/3] = ain;
+                    g++;
+                               
+                }
+                if (g == 720) {
+                    ADC_102();
+                    return 0;
+                }
+            }
+        }
+        }
+
 }
 int main()
 {
     DAC_102();
-// int x = ULCD();
-  //  if(x == 1) printf("1\n");
-  //  else printf("0\n");
-  /*  if(x == 1) {
-        float ADCdata[300];
-        int g = 0;
-        while (1) {
-            for (float i = 0.0f; i < 150.0f; i += 1.0f) {
-                double sam = 0;
-                if(i < 135) {
-                   sam =  i / 150;
-                }
-                else {
-                   sam = (150 - i) / 15 * 9 / 10;
-                }
-                aout = sam;
-                if (g%5 == 0)
-                ADCdata[g/5] = ain;
-                g++;
-             
-            }
-            if (g == 1500) {
-                for (int i = 0; i < 300; i++) {
-                    printf("%f\r\n", ADCdata[i] * 3.3);
-                    ThisThread::sleep_for(100ms);
-                }
-                g = 0;
-                return 0;
-            }
-        }
-
-    } else if (x == 0) {
-        float ADCdata[300];
-        int g = 0;
-        while (1) {
-            for (float i = 0.0f; i < 300.0f; i += 1.0f) {
-                double sam = 0;
-                if(i < 270) {
-                   sam =  i / 300;
-                }
-                else {
-                   sam = (300 - i) / 30 * 9 / 10;
-                }
-                aout = sam;
-                if (g%3 == 0)
-                ADCdata[g/3] = ain;
-                g++;
-             
-            }
-            if (g == 900) {
-                for (int i = 0; i < 300; i++) {
-                    printf("%f\r\n", ADCdata[i] * 3.3);
-                    ThisThread::sleep_for(100ms);
-                }
-                g = 0;
-                return 0;
-            }
-        }
-    }*/
-    
+    return 0;
 }
