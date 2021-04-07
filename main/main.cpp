@@ -7,7 +7,7 @@ uLCD_4DGL uLCD(D1, D0, D2); // serial tx, serial rx, reset pin;
 InterruptIn BT1(A3), BT2(A4), BT3(A5);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
 EventQueue queue2(32 * EVENTS_EVENT_SIZE);
-EventQueue queue3(128 * EVENTS_EVENT_SIZE);
+EventQueue queue3(32 * EVENTS_EVENT_SIZE);
 AnalogOut  aout(PA_4);
 AnalogIn ain(A0);
 int U = 0;
