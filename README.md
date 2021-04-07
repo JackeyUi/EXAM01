@@ -23,3 +23,5 @@ ADC input A0
 2-2 is from the ADC of the slew rate = 1/2.
 4-2 is from the ADC of the slew rate = 1/4.
 8-2 is from the ADC of the slew rate = 1/8.
+
+DSC_0531 is a pic that I'm testing the program.
